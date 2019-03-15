@@ -1,0 +1,10 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.pulkit.epicentre">
+
+    <application>
+        <activity
+            android:name="com.example.pulkit.epicentre.MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+    </application>
+</manifest>
