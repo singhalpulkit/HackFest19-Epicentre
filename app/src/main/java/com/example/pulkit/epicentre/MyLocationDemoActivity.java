@@ -16,21 +16,8 @@
 
 package com.example.pulkit.epicentre;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMyLocationClickListener;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.VisibleRegion;
-
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -43,6 +30,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.pulkit.epicentre.data.DataPoint;
+import com.example.pulkit.epicentre.data.DataPointList;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMyLocationClickListener;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.VisibleRegion;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.List;
@@ -79,9 +79,9 @@ public class MyLocationDemoActivity extends AppCompatActivity
 
     private GoogleMap mMap;
 
-    String queryCreation(VisibleRegion boundary){
-        return "minLat="+boundary.latLngBounds.southwest.latitude+"&maxLat="+boundary.latLngBounds.northeast.latitude
-                +"&minLag="+boundary.latLngBounds.southwest.longitude+"&maxLag="+boundary.latLngBounds.northeast.longitude;
+    String queryCreation(VisibleRegion boundary) {
+        return "minLat=" + boundary.latLngBounds.southwest.latitude + "&maxLat=" + boundary.latLngBounds.northeast.latitude
+                + "&minLag=" + boundary.latLngBounds.southwest.longitude + "&maxLag=" + boundary.latLngBounds.northeast.longitude;
     }
 
     @Override
@@ -95,7 +95,7 @@ public class MyLocationDemoActivity extends AppCompatActivity
 
 
         // Drawing circle on the map
-       // drawCircle(new LatLng(23.78, 86.41));
+        // drawCircle(new LatLng(23.78, 86.41));
     }
 
 //    private void drawCircle(LatLng point){
@@ -124,7 +124,6 @@ public class MyLocationDemoActivity extends AppCompatActivity
 //    }
 
 
-
     public void onMapSearch(View view) {
         EditText locationSearch = (EditText) findViewById(R.id.editText);
         String location = locationSearch.getText().toString();
@@ -146,7 +145,6 @@ public class MyLocationDemoActivity extends AppCompatActivity
     }
 
 
-
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;
@@ -155,6 +153,7 @@ public class MyLocationDemoActivity extends AppCompatActivity
         mMap.setOnMyLocationClickListener(this);
         enableMyLocation();
 
+        DataPointList dataset = null;
 
         mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
                                          @Override
@@ -162,40 +161,59 @@ public class MyLocationDemoActivity extends AppCompatActivity
 //                double CameraLat = mMap.getCameraPosition().target.latitude;
 //                double CameraLong = mMap.getCameraPosition().target.longitude;
 //                double zoomlevel = mMap.getCameraPosition().zoom;
+                                             final VisibleRegion bounds = mMap.getProjection().getVisibleRegion();
 
-                 final VisibleRegion bounds = mMap.getProjection().getVisibleRegion();
+                                             AsyncTask asyncTask = new AsyncTask() {
+                                                 @Override
+                                                 protected Object doInBackground(Object[] objects) {
+                                                     OkHttpClient client = new OkHttpClient();
 
-                 AsyncTask asyncTask = new AsyncTask() {
-                     @Override
-                     protected Object doInBackground(Object[] objects) {
-                         OkHttpClient client = new OkHttpClient();
+                                                     Request request = new Request.Builder()
+                                                             //.url("http://192.168.137.1:8080/fetchdata/data?" + queryCreation(bounds))
+                                                             .url("http://192.168.137.1:8080/fetchdata/alldata")
+                                                             .build();
 
-                         Request request = new Request.Builder()
-                                 .url("http://192.168.137.1:8080/fetchdata/data?" + queryCreation(bounds))
-                                 .build();
+                                                     Response response = null;
+                                                     String string = null;
 
-                         Response response = null;
+                                                     try {
 
-                         try {
+                                                         response = client.newCall(request).execute();
+                                                         string = response.body().string();
+                                                         string = "{\"dataPoints\":" + string + "}";
+                                                         Gson g = new Gson();
+                                                         DataPointList dataset = g.fromJson(string, DataPointList.class);
+                                                         //return response.body().string();
+                                                         //int i=0;
+                                                         /*if (dataset.getDataPoints().size() != 0)
+                                                             for (DataPoint d : dataset.getDataPoints()) {
+                                                                 mMap.addMarker(new MarkerOptions().position(new LatLng(Double.valueOf(d.getLat()), Double.valueOf(d.getLng()))).title(d.getDisease()));
 
-                             response = client.newCall(request).execute();
+                                                             }*/
+                                                         DataPoint dataPoint = new DataPoint();
+                                                         dataPoint.setLat("23.809497");
+                                                         dataPoint.setLng("86.436736");
+                                                         mMap.addMarker(new MarkerOptions().position(new LatLng(Double.valueOf(dataPoint.getLat()), Double.valueOf(dataPoint.getLng()))).title(dataPoint.getDisease()));
 
-                         } catch (IOException e) {
-                             e.printStackTrace();
-                         }
-                         return null;
-                     }
-                 }.execute();
-             }
-         }
+                                                     } catch (IOException e) {
+                                                         e.printStackTrace();
+                                                     }
+                                                     return null;
+                                                 }
+                                             }.execute();
+                                         }
+                                     }
         );
 
-        Circle circle = map.addCircle(new CircleOptions()
-                .center(new LatLng(23.78, 86.41))
-                .radius(10000)
-                .strokeColor(Color.RED)
-                .strokeWidth(2)
-                .fillColor(0x55ff0000));
+//        Circle circle = map.addCircle(new CircleOptions()
+//                .center(new LatLng(23.78, 86.41))
+//                .radius(10000)
+//                .strokeColor(Color.RED)
+//                .strokeWidth(2)
+//                .fillColor(0x55ff0000));
+
+
+        //mMap.addMarker(new MarkerOptions().position(new LatLng(23.78,86.41)).title("Swine Flu"));
 
     }
 
@@ -261,8 +279,6 @@ public class MyLocationDemoActivity extends AppCompatActivity
         PermissionUtils.PermissionDeniedDialog
                 .newInstance(true).show(getSupportFragmentManager(), "dialog");
     }
-
-
 
 
 }
