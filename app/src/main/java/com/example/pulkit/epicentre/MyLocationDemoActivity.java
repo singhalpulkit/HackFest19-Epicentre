@@ -22,12 +22,15 @@ import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -89,7 +92,36 @@ public class MyLocationDemoActivity extends AppCompatActivity
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
+        // Drawing circle on the map
+       // drawCircle(new LatLng(23.78, 86.41));
     }
+
+//    private void drawCircle(LatLng point){
+//
+//        // Instantiating CircleOptions to draw a circle around the marker
+//        CircleOptions circleOptions = new CircleOptions();
+//
+//        // Specifying the center of the circle
+//        circleOptions.center(point);
+//
+//        // Radius of the circle
+//        circleOptions.radius(50);
+//
+//        // Border color of the circle
+//        circleOptions.strokeColor(Color.BLUE);
+//
+//        // Fill color of the circle
+//        circleOptions.fillColor(0x30ff0000);
+//
+//        // Border width of the circle
+//        circleOptions.strokeWidth(2);
+//
+//        // Adding the circle to the GoogleMap
+//        mMap.addCircle(circleOptions);
+//
+//    }
 
 
 
@@ -157,6 +189,14 @@ public class MyLocationDemoActivity extends AppCompatActivity
              }
          }
         );
+
+        Circle circle = map.addCircle(new CircleOptions()
+                .center(new LatLng(23.78, 86.41))
+                .radius(10000)
+                .strokeColor(Color.RED)
+                .strokeWidth(2)
+                .fillColor(0x55ff0000));
+
     }
 
     /**
