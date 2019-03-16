@@ -21,16 +21,24 @@ import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.VisibleRegion;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
+
+import java.io.IOException;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * This demo shows how GMS Location can be used to check for changes to the users location.  The
@@ -60,6 +68,11 @@ public class MyLocationDemoActivity extends AppCompatActivity
 
     private GoogleMap mMap;
 
+    String queryCreation(VisibleRegion boundary){
+        return "minLat="+boundary.latLngBounds.southwest.latitude+"&maxLat="+boundary.latLngBounds.northeast.latitude
+                +"&minLag="+boundary.latLngBounds.southwest.longitude+"&maxLag="+boundary.latLngBounds.northeast.longitude;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +90,41 @@ public class MyLocationDemoActivity extends AppCompatActivity
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
         enableMyLocation();
+
+
+        mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+                                         @Override
+                                         public void onCameraIdle() {
+//                double CameraLat = mMap.getCameraPosition().target.latitude;
+//                double CameraLong = mMap.getCameraPosition().target.longitude;
+//                double zoomlevel = mMap.getCameraPosition().zoom;
+
+                 final VisibleRegion bounds = mMap.getProjection().getVisibleRegion();
+
+                 AsyncTask asyncTask = new AsyncTask() {
+                     @Override
+                     protected Object doInBackground(Object[] objects) {
+                         OkHttpClient client = new OkHttpClient();
+
+                         Request request = new Request.Builder()
+                                 .url("http://192.168.137.1:8080/fetchdata/data?" + queryCreation(bounds))
+                                 .build();
+
+                         Response response = null;
+
+                         try {
+
+                             response = client.newCall(request).execute();
+
+                         } catch (IOException e) {
+                             e.printStackTrace();
+                         }
+                         return null;
+                     }
+                 }.execute();
+             }
+         }
+        );
     }
 
     /**
