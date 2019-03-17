@@ -1,18 +1,3 @@
-/*
- * Copyright (C) 2012 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 package com.example.pulkit.epicentre;
 
@@ -84,7 +69,6 @@ public class MyLocationDemoActivity extends AppCompatActivity
 
     private GoogleMap mMap;
 
-    //public Marker marker = new Marker();
     public HashMap<Marker,String> hashmap = new HashMap<>();
 
     String queryCreation(VisibleRegion boundary){
@@ -102,34 +86,9 @@ public class MyLocationDemoActivity extends AppCompatActivity
         mapFragment.getMapAsync(this);
 
 
-        // Drawing circle on the map
-       // drawCircle(new LatLng(23.78, 86.41));
+
     }
 
-//    private void drawCircle(LatLng point){
-//
-//        // Instantiating CircleOptions to draw a circle around the marker
-//        CircleOptions circleOptions = new CircleOptions();
-//
-//        // Specifying the center of the circle
-//        circleOptions.center(point);
-//
-//        // Radius of the circle
-//        circleOptions.radius(50);
-//
-//        // Border color of the circle
-//        circleOptions.strokeColor(Color.BLUE);
-//
-//        // Fill color of the circle
-//        circleOptions.fillColor(0x30ff0000);
-//
-//        // Border width of the circle
-//        circleOptions.strokeWidth(2);
-//
-//        // Adding the circle to the GoogleMap
-//        mMap.addCircle(circleOptions);
-//
-//    }
 
 
 
@@ -169,9 +128,6 @@ public class MyLocationDemoActivity extends AppCompatActivity
         mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
                                          @Override
                                          public void onCameraIdle() {
-//                double CameraLat = mMap.getCameraPosition().target.latitude;
-//                double CameraLong = mMap.getCameraPosition().target.longitude;
-//                double zoomlevel = mMap.getCameraPosition().zoom;
 
                  final VisibleRegion bounds = mMap.getProjection().getVisibleRegion();
 
@@ -214,12 +170,7 @@ public class MyLocationDemoActivity extends AppCompatActivity
 
 
 
-//        plot(33,84, 50,0x55ff0000,"Test");
-//        plot(27,84, 50,0x55ff0000,"Test");
-//        plot(24,84, 50,0x55ff0000,"Test");
-//        plot(42,84, 50,0x55ff0000,"Test");
-//        plot(63,84, 50,0x55ff0000,"Test");
-    }
+  }
 
 
     void plot(double lat,double lng, double rad, int clr_hex, String title,String url){
@@ -230,7 +181,6 @@ public class MyLocationDemoActivity extends AppCompatActivity
                 .strokeColor(Color.BLACK)
                 .strokeWidth(1)
                 .fillColor(clr_hex));
-       // mMap.addMarker(new MarkerOptions().title(title).position(new LatLng(lat,lng))).showInfoWindow();
         Marker marker = mMap.addMarker(new MarkerOptions().title(title).position(new LatLng(lat,lng)));
         hashmap.put(marker,url);
     }
