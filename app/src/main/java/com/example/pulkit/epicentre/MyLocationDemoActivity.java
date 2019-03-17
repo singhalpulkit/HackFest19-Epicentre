@@ -171,7 +171,7 @@ public class MyLocationDemoActivity extends AppCompatActivity
                          OkHttpClient client = new OkHttpClient();
 
                          Request request = new Request.Builder()
-                                 .url("http://192.168.137.1:8080/fetchdata/data?" + queryCreation(bounds))
+                                 .url("http://192.168.137.1:8080/fetchdata/areadata?" + queryCreation(bounds))
                                  .build();
 
                          Response response = null;
@@ -190,13 +190,36 @@ public class MyLocationDemoActivity extends AppCompatActivity
          }
         );
 
-        Circle circle = map.addCircle(new CircleOptions()
-                .center(new LatLng(23.78, 86.41))
-                .radius(10000)
-                .strokeColor(Color.RED)
-                .strokeWidth(2)
-                .fillColor(0x55ff0000));
+        //iit dhanbad
+        plot(23.825210,86.440390, 2000*0.11729288002019206,0x55ff0000,"Swine Flu");
+        plot(23.815210,86.430390, 2500*0.12674208338559803,0x55ffff00,"Malaria");
 
+        //IGI
+        plot(28.546324, 77.096304, 2100*0.11729288002019206,0x55808000,"Dengue");
+        plot(28.566324, 77.079304, 1900*0.11729288002019206,0x55B22222,"Ebola");
+        plot(28.568324, 77.089304, 2300*0.11729288002019206,0x55ff0000,"Swine Flu");
+        plot(28.588324, 77.090304, 2800*0.11729288002019206,0x55ffff00,"Malaria");
+
+
+
+
+
+//        plot(33,84, 50,0x55ff0000,"Test");
+//        plot(27,84, 50,0x55ff0000,"Test");
+//        plot(24,84, 50,0x55ff0000,"Test");
+//        plot(42,84, 50,0x55ff0000,"Test");
+//        plot(63,84, 50,0x55ff0000,"Test");
+    }
+
+    void plot(double lat,double lng, double rad, int clr_hex, String title){
+
+        Circle circle = mMap.addCircle(new CircleOptions()
+                .center(new LatLng(lat, lng))
+                .radius(rad)
+                .strokeColor(Color.BLACK)
+                .strokeWidth(1)
+                .fillColor(clr_hex));
+        mMap.addMarker(new MarkerOptions().title(title).position(new LatLng(lat,lng)));
     }
 
     /**
