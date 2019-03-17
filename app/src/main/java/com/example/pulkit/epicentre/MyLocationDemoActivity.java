@@ -25,15 +25,18 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -45,6 +48,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.OkHttpClient;
@@ -60,6 +64,7 @@ import okhttp3.Response;
 public class MyLocationDemoActivity extends AppCompatActivity
         implements
         OnMyLocationButtonClickListener,
+        GoogleMap.OnInfoWindowClickListener,
         OnMyLocationClickListener,
         OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback {
@@ -78,6 +83,9 @@ public class MyLocationDemoActivity extends AppCompatActivity
     private boolean mPermissionDenied = false;
 
     private GoogleMap mMap;
+
+    //public Marker marker = new Marker();
+    public HashMap<Marker,String> hashmap = new HashMap<>();
 
     String queryCreation(VisibleRegion boundary){
         return "minLat="+boundary.latLngBounds.southwest.latitude+"&maxLat="+boundary.latLngBounds.northeast.latitude
@@ -151,8 +159,10 @@ public class MyLocationDemoActivity extends AppCompatActivity
     public void onMapReady(GoogleMap map) {
         mMap = map;
 
+
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
+        mMap.setOnInfoWindowClickListener(this);
         enableMyLocation();
 
 
@@ -191,14 +201,14 @@ public class MyLocationDemoActivity extends AppCompatActivity
         );
 
         //iit dhanbad
-        plot(23.825210,86.440390, 2000*0.11729288002019206,0x55ff0000,"Swine Flu");
-        plot(23.815210,86.430390, 2500*0.12674208338559803,0x55ffff00,"Malaria");
+        plot(23.825210,86.440390, 2000*0.11729288002019206,0x55ff0000,"Swine Flu", "https://www.cdc.gov/h1n1flu/general_info.htm");
+        plot(23.815210,86.430390, 2500*0.12674208338559803,0x55ffff00,"Malaria", "https://www.cdc.gov/malaria/prevent_control.html");
 
         //IGI
-        plot(28.546324, 77.096304, 2100*0.11729288002019206,0x55808000,"Dengue");
-        plot(28.566324, 77.079304, 1900*0.11729288002019206,0x55B22222,"Ebola");
-        plot(28.568324, 77.089304, 2300*0.11729288002019206,0x55ff0000,"Swine Flu");
-        plot(28.588324, 77.090304, 2800*0.11729288002019206,0x55ffff00,"Malaria");
+        plot(28.546324, 77.096304, 2100*0.11729288002019206,0x55808000,"Dengue", "https://www.cdc.gov/features/avoid-dengue/index.html");
+        plot(28.566324, 77.079304, 1900*0.11729288002019206,0x55B22222,"Ebola", "https://www.cdc.gov/vhf/ebola/prevention/index.html");
+        plot(28.568324, 77.089304, 2300*0.11729288002019206,0x55ff0000,"Swine Flu", "https://www.cdc.gov/h1n1flu/general_info.htm");
+        plot(28.588324, 77.090304, 2800*0.11729288002019206,0x55ffff00,"Malaria", "https://www.cdc.gov/malaria/prevent_control.html");
 
 
 
@@ -211,7 +221,8 @@ public class MyLocationDemoActivity extends AppCompatActivity
 //        plot(63,84, 50,0x55ff0000,"Test");
     }
 
-    void plot(double lat,double lng, double rad, int clr_hex, String title){
+
+    void plot(double lat,double lng, double rad, int clr_hex, String title,String url){
 
         Circle circle = mMap.addCircle(new CircleOptions()
                 .center(new LatLng(lat, lng))
@@ -219,7 +230,9 @@ public class MyLocationDemoActivity extends AppCompatActivity
                 .strokeColor(Color.BLACK)
                 .strokeWidth(1)
                 .fillColor(clr_hex));
-        mMap.addMarker(new MarkerOptions().title(title).position(new LatLng(lat,lng)));
+       // mMap.addMarker(new MarkerOptions().title(title).position(new LatLng(lat,lng))).showInfoWindow();
+        Marker marker = mMap.addMarker(new MarkerOptions().title(title).position(new LatLng(lat,lng)));
+        hashmap.put(marker,url);
     }
 
     /**
@@ -236,6 +249,19 @@ public class MyLocationDemoActivity extends AppCompatActivity
             mMap.setMyLocationEnabled(true);
         }
     }
+
+
+    @Override
+    public void onInfoWindowClick(final Marker marker) {
+
+        if (marker.equals(marker))
+        {
+            Uri uriUrl = Uri.parse(hashmap.get(marker));
+            Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
+            startActivity(launchBrowser);
+        }
+    }
+
 
     @Override
     public boolean onMyLocationButtonClick() {
